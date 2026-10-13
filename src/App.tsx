@@ -14,6 +14,7 @@ import { AttackGraph } from './components/AttackGraph';
 import { PacketInspector } from './components/PacketInspector';
 import { PcapFileCarver } from './components/PcapFileCarver';
 import { VoipCallAnalyzer } from './components/VoipCallAnalyzer';
+import { FortinetSophosBenchmark } from './components/FortinetSophosBenchmark';
 import { GlobalThreatMap } from './components/GlobalThreatMap';
 import { AIInvestigatorView } from './components/AIInvestigatorView';
 import { MitreCoverage } from './components/MitreCoverage';
@@ -22,6 +23,8 @@ import { ResponsePlaybooks } from './components/ResponsePlaybooks';
 import { IngestionLab } from './components/IngestionLab';
 import { EvidenceLedgerModal } from './components/EvidenceLedgerModal';
 import { ExportReportModal } from './components/ExportReportModal';
+import { VulnerabilityCenter } from './components/VulnerabilityCenter';
+import { ArchitectureModal } from './components/ArchitectureModal';
 import { getScenarioData, MOCK_INCIDENT_S1, MOCK_ASSETS } from './engine/sample-data';
 import { Incident, NormalizedEvent, UnifiedAsset } from './types/security';
 import { correlateEvents } from './engine/correlation';
@@ -34,6 +37,7 @@ export default function App() {
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isEvidenceLedgerModalOpen, setIsEvidenceLedgerModalOpen] = useState(false);
+  const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -76,6 +80,7 @@ export default function App() {
         onOpenReport={() => setIsReportModalOpen(true)}
         onOpenEvidenceLedger={() => setIsEvidenceLedgerModalOpen(true)}
         onOpenAIQuery={() => setActiveTab('ai')}
+        onOpenReadme={() => setIsReadmeModalOpen(true)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(prev => !prev)}
       />
@@ -115,12 +120,20 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'vulnerabilities' && (
+          <VulnerabilityCenter onNavigateToWorkbench={() => setActiveTab('workbench')} />
+        )}
+
         {activeTab === 'carver' && (
           <PcapFileCarver />
         )}
 
         {activeTab === 'voip' && (
           <VoipCallAnalyzer />
+        )}
+
+        {activeTab === 'fortinet-sophos' && (
+          <FortinetSophosBenchmark incident={activeIncident} />
         )}
 
         {activeTab === 'threat-map' && (
@@ -176,6 +189,11 @@ export default function App() {
         incident={activeIncident}
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
+      />
+
+      <ArchitectureModal
+        isOpen={isReadmeModalOpen}
+        onClose={() => setIsReadmeModalOpen(false)}
       />
     </div>
   );

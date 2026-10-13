@@ -7,6 +7,7 @@
 
 export type ToolSource = 
   | 'NMAP' 
+  | 'OPENVAS_GREENBONE'
   | 'SURICATA' 
   | 'ZEEK' 
   | 'WIRESHARK_TSHARK' 
@@ -17,6 +18,7 @@ export type ToolSource =
 
 export type EventCategory = 
   | 'DISCOVERY' 
+  | 'VULNERABILITY'
   | 'NETWORK_ALERT' 
   | 'FLOW' 
   | 'ENDPOINT_PROCESS' 
@@ -258,3 +260,32 @@ export interface GeoThreatFeed {
   actionTaken: 'BLOCKED_AT_EDGE' | 'DROPPED_BY_IPS' | 'ISOLATED_BY_EDR' | 'FLAGGED_FOR_AUDIT';
   throughputKbps: number;
 }
+
+export interface VulnerabilityFinding {
+  id: string;
+  cveId: string;
+  nvtName: string;
+  cvssScore: number;
+  severity: SeverityLevel;
+  targetHost: string;
+  targetPort: number;
+  service: string;
+  summary: string;
+  impact: string;
+  solution: string;
+  cvePublishedYear: number;
+  exploitAvailable: boolean;
+  detectedAt: string;
+}
+
+export interface ScheduledScanJob {
+  id: string;
+  engine: 'NMAP' | 'OPENVAS_GREENBONE' | 'SURICATA' | 'ZEEK' | 'WAZUH' | 'WIRESHARK_TSHARK';
+  name: string;
+  targetScope: string;
+  status: 'COMPLETED' | 'RUNNING' | 'QUEUED' | 'FAILED';
+  lastRunTime: string;
+  nextRunTime: string;
+  findingsCount: number;
+}
+

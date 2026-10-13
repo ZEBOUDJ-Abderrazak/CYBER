@@ -17,15 +17,19 @@ import {
   UploadCloud,
   Binary,
   PhoneCall,
-  Globe
+  Globe,
+  Award,
+  Flame
 } from 'lucide-react';
 
 export type TabId = 
   | 'workbench' 
+  | 'vulnerabilities'
   | 'topology' 
   | 'packets' 
   | 'carver'
   | 'voip'
+  | 'fortinet-sophos'
   | 'threat-map'
   | 'ai' 
   | 'mitre' 
@@ -48,9 +52,11 @@ export const Navigation: React.FC<NavigationProps> = ({
 }) => {
   const tabs = [
     { id: 'workbench', label: 'Investigation Workbench', icon: Compass },
+    { id: 'vulnerabilities', label: 'Greenbone / OpenVAS', icon: Flame, badge: 'Vulnerability Audit' },
     { id: 'carver', label: 'Wireshark Object Carving', icon: Binary, badge: 'Files & Images' },
     { id: 'voip', label: 'VoIP & Voice RTP', icon: PhoneCall, badge: 'Audio Player' },
-    { id: 'threat-map', label: 'Global Threat Radar', icon: Globe, badge: 'Fortinet / Sophos' },
+    { id: 'fortinet-sophos', label: 'Fortinet vs Sophos 1000x', icon: Award, badge: 'Benchmark & Rules' },
+    { id: 'threat-map', label: 'Global Threat Radar', icon: Globe },
     { id: 'topology', label: 'Attack Path Graph', icon: GitBranch },
     { id: 'packets', label: 'Packet Inspector', icon: FileSearch },
     { id: 'ai', label: 'AI Investigator', icon: Sparkles },

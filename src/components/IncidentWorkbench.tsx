@@ -67,6 +67,7 @@ export const IncidentWorkbench: React.FC<IncidentWorkbenchProps> = ({
     if (isDarkMode) {
       switch (tool) {
         case 'NMAP': return 'bg-amber-950/70 text-amber-300 border-amber-700/50';
+        case 'OPENVAS_GREENBONE': return 'bg-orange-950/70 text-orange-300 border-orange-700/50';
         case 'SURICATA': return 'bg-rose-950/70 text-rose-300 border-rose-700/50';
         case 'ZEEK': return 'bg-purple-950/70 text-purple-300 border-purple-700/50';
         case 'WIRESHARK_TSHARK': return 'bg-sky-950/70 text-sky-300 border-sky-700/50';
@@ -78,6 +79,7 @@ export const IncidentWorkbench: React.FC<IncidentWorkbenchProps> = ({
     // Clean, crisp enterprise light mode styling
     switch (tool) {
       case 'NMAP': return 'bg-amber-50 text-amber-800 border-amber-200';
+      case 'OPENVAS_GREENBONE': return 'bg-orange-50 text-orange-800 border-orange-200';
       case 'SURICATA': return 'bg-rose-50 text-rose-800 border-rose-200';
       case 'ZEEK': return 'bg-purple-50 text-purple-800 border-purple-200';
       case 'WIRESHARK_TSHARK': return 'bg-sky-50 text-sky-800 border-sky-200';

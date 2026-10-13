@@ -20,7 +20,10 @@ import {
   Download,
   Share2,
   Sun,
-  Moon
+  Moon,
+  BookOpen,
+  Flame,
+  UserCheck
 } from 'lucide-react';
 import { Incident } from '../types/security';
 
@@ -31,6 +34,7 @@ interface HeaderProps {
   onOpenReport: () => void;
   onOpenEvidenceLedger: () => void;
   onOpenAIQuery: () => void;
+  onOpenReadme?: () => void;
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
 }
@@ -42,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenReport,
   onOpenEvidenceLedger,
   onOpenAIQuery,
+  onOpenReadme,
   isDarkMode = false,
   onToggleDarkMode
 }) => {
@@ -56,65 +61,59 @@ export const Header: React.FC<HeaderProps> = ({
         isDarkMode ? 'border-slate-900' : 'border-slate-100'
       }`}>
         <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 via-blue-700 to-sky-600 border border-indigo-400/40 shadow-md shadow-indigo-600/10">
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 via-blue-700 to-sky-600 border border-indigo-400/40 shadow-md shadow-indigo-600/10 shrink-0">
             <ShieldAlert className="w-5 h-5 text-white" />
             <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full animate-pulse" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`text-lg font-black tracking-wider ${
                 isDarkMode 
                   ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-200' 
                   : 'text-slate-900'
               }`}>
-                SENTINEL FUSION
+                OPEN SECURITY FUSION
               </span>
               <span className={`px-1.5 py-0.5 text-[10px] font-mono font-bold tracking-wider uppercase rounded-md border ${
                 isDarkMode 
                   ? 'bg-cyan-950/80 text-cyan-400 border-cyan-700/50' 
                   : 'bg-indigo-50 text-indigo-700 border-indigo-200'
               }`}>
-                CORE XDR v2.4
+                UNIFIED v2.4
               </span>
+
+              {/* Lead Architect & Operator Badge */}
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-medium">
+                <UserCheck className="w-3 h-3 text-indigo-600" />
+                <span>Lead Architect: <strong className="text-slate-900">Zeboudj Abderarzak</strong></span>
+              </div>
             </div>
             <p className="text-xs text-slate-500 hidden sm:block font-medium">
-              Next-Gen SOC Intelligence • Network Forensics • Wireshark Carving & VoIP Audio
+              One Platform · Multiple Security Engines · Nmap · OpenVAS · Suricata · Zeek · Wazuh · Wireshark
             </p>
           </div>
         </div>
 
-        {/* Live Active Sensor Feeds */}
-        <div className="hidden xl:flex items-center gap-2 text-xs font-mono">
-          <span className="text-slate-400 text-[11px] uppercase mr-1">Active Sensors:</span>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
-          }`}>
+        {/* Live Active Sensor Feeds across the 6 Unified Engines */}
+        <div className="hidden xl:flex items-center gap-1.5 text-xs font-mono">
+          <span className="text-slate-400 text-[11px] uppercase mr-1">6 Engines:</span>
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-[11px]" title="Network Discovery">
             <Radio className="w-3 h-3 text-emerald-500 animate-pulse" /> Nmap
           </div>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
-          }`}>
-            <Activity className="w-3 h-3 text-emerald-500" /> Suricata IDS
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-orange-50 border-orange-200 text-orange-800 text-[11px]" title="Vulnerability Assessment">
+            <Flame className="w-3 h-3 text-orange-600" /> OpenVAS
           </div>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
-          }`}>
-            <Cpu className="w-3 h-3 text-emerald-500" /> Zeek
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-[11px]" title="Network Threat Detection">
+            <Activity className="w-3 h-3 text-rose-500" /> Suricata
           </div>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-indigo-400' : 'bg-slate-50 border-slate-200 text-indigo-700'
-          }`}>
-            <Terminal className="w-3 h-3 text-indigo-500" /> Wireshark PCAP
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-[11px]" title="Behavioral Protocol Telemetry">
+            <Cpu className="w-3 h-3 text-purple-500" /> Zeek
           </div>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
-          }`}>
-            <Lock className="w-3 h-3 text-emerald-500" /> Wazuh EDR
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-[11px]" title="Endpoint Protection & EDR">
+            <Lock className="w-3 h-3 text-emerald-500" /> Wazuh
           </div>
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800 text-cyan-400' : 'bg-slate-50 border-slate-200 text-sky-700'
-          }`}>
-            <Database className="w-3 h-3 text-sky-500" /> MISP Intel
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border bg-slate-50 border-slate-200 text-slate-700 text-[11px]" title="Packet Forensics & Object Carving">
+            <Terminal className="w-3 h-3 text-indigo-500" /> Wireshark
           </div>
         </div>
 
@@ -130,9 +129,9 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'bg-white border-slate-200 text-slate-800 shadow-2xs hover:border-slate-300'
               }`}
             >
-              <option value="scenario_1">Scenario 1: Operation PhantomBeacon (Spring/JNDI RCE)</option>
-              <option value="scenario_2">Scenario 2: Ransomware Lateral Pivot (LockBit Simulation)</option>
-              <option value="scenario_3">Scenario 3: Covert DNS Tunneling Exfiltration</option>
+              <option value="scenario_1">Active Case 1: Operation PhantomBeacon (Spring/JNDI RCE Incident)</option>
+              <option value="scenario_2">Active Case 2: Ransomware Lateral Pivot (LockBit 3.0 Live Intrusions)</option>
+              <option value="scenario_3">Active Case 3: Covert DNS Tunneling & High-Entropy Exfiltration</option>
             </select>
           </div>
 
@@ -170,6 +169,21 @@ export const Header: React.FC<HeaderProps> = ({
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span className="hidden sm:inline">Report</span>
           </button>
+
+          {onOpenReadme && (
+            <button
+              onClick={onOpenReadme}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-xs rounded-xl transition cursor-pointer ${
+                isDarkMode 
+                  ? 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300' 
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-2xs'
+              }`}
+              title="View & Download Platform README.md Architecture Dossier"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">README</span>
+            </button>
+          )}
 
           {onToggleDarkMode && (
             <button

