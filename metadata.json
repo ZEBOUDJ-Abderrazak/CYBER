@@ -1,0 +1,6 @@
+{
+  "name": "SENTINEL FUSION",
+  "description": "Unified Cyber Defense, Network Intelligence & Autonomous Investigation Platform connecting Nmap, Wireshark/Zeek, Suricata, Wazuh, and MITRE ATT&CK into a correlated evidence graph.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
